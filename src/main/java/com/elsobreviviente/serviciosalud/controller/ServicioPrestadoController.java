@@ -24,7 +24,7 @@ import com.elsobreviviente.serviciosalud.service.ServicioPrestadoService;
 
 @RestController
 @RequestMapping("/api/servicioPrestado")
-@CrossOrigin(origins = "http://localhost:4200/")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ServicioPrestadoController {
 
 	@Autowired

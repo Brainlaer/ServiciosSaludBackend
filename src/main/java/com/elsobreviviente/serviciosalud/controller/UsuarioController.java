@@ -21,7 +21,7 @@ import com.elsobreviviente.serviciosalud.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuario")
-@CrossOrigin(origins = "http://localhost:4200/")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UsuarioController {
 
 	@Autowired
