@@ -50,25 +50,34 @@ pipeline {
                     set -eu
                     docker compose -p "$COMPOSE_PROJECT_NAME" -f docker-compose.ci.yml up -d --no-build
 
-                    attempt=1
-                    while [ "$attempt" -le 30 ]; do
-                        if docker compose -p "$COMPOSE_PROJECT_NAME" -f docker-compose.ci.yml exec -T frontend \
-                            wget -q -O /dev/null http://backend:8082/api/servicio/listaServicioDto2; then
-                            echo "Frontend container reached backend by its Compose service name."
-                            docker compose -p "$COMPOSE_PROJECT_NAME" -f docker-compose.ci.yml exec -T frontend \
-                                wget -q -O /dev/null http://localhost/
-                            docker compose -p "$COMPOSE_PROJECT_NAME" -f docker-compose.ci.yml exec -T frontend \
-                                wget -q -O /dev/null http://localhost/api/servicio/listaServicioDto2
-                            echo "Frontend page and reverse proxy are responding."
-                            exit 0
-                        fi
-                        echo "Waiting for backend and database (attempt $attempt/30)..."
-                        sleep 2
-                        attempt=$((attempt + 1))
-                    done
+                    wait_for_http() {
+                        url=$1
+                        description=$2
+                        attempt=1
+                        while [ "$attempt" -le 30 ]; do
+                            if docker compose -p "$COMPOSE_PROJECT_NAME" -f docker-compose.ci.yml exec -T frontend \
+                                wget -q -T 3 -O /dev/null "$url"; then
+                                echo "$description"
+                                return 0
+                            fi
+                            echo "Waiting for $url (attempt $attempt/30)..."
+                            sleep 2
+                            attempt=$((attempt + 1))
+                        done
 
-                    echo "Frontend could not reach the backend API after 60 seconds."
-                    exit 1
+                        echo "Timed out waiting for $url."
+                        return 1
+                    }
+
+                    wait_for_http \
+                        http://backend:8082/api/servicio/listaServicioDto2 \
+                        "Frontend container reached backend by its Compose service name."
+                    wait_for_http \
+                        http://localhost/ \
+                        "Frontend page is responding."
+                    wait_for_http \
+                        http://localhost/api/servicio/listaServicioDto2 \
+                        "Frontend reverse proxy is responding."
                 '''
             }
         }
