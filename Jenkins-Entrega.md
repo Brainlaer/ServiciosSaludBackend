@@ -104,7 +104,7 @@ Guardar cada job y ejecutarlo una vez manualmente para registrar su configuraci�
 
 El pipeline construye las imágenes `serviciosalud-backend:<número-de-build>` y `serviciosalud-frontend:<número-de-build>`. El Dockerfile del backend empaqueta la aplicación Spring Boot; el del frontend compila Angular y sirve los archivos con Nginx. Nginx reenvía `/api` al servicio `backend:8082`, y Angular usa una ruta relativa para que la misma configuración funcione detrás del proxy.
 
-En la etapa `Test`, `docker-compose.ci.yml` inicia PostgreSQL, backend y frontend en una red privada temporal. Jenkins solicita el endpoint del backend desde el contenedor frontend usando `http://backend:8082/...`; los fallos de DNS, conexión o respuesta HTTP hacen fallar el build. Luego también comprueba `/` y `/api` a través de Nginx. El bloque `post` recoge logs y elimina los contenedores y volúmenes del proyecto de prueba tanto en éxito como en fallo.
+En la etapa `Test`, `docker-compose.ci.yml` inicia PostgreSQL, backend y frontend en una red privada temporal. El healthcheck de PostgreSQL espera a que la base esté lista y crea el esquema `salud`; así la prueba no depende de montar `init.sql` desde el workspace de Jenkins hacia el daemon Docker del host. Jenkins solicita el endpoint del backend desde el contenedor frontend usando `http://backend:8082/...`; los fallos de DNS, conexión o respuesta HTTP hacen fallar el build. Luego también comprueba `/` y `/api` a través de Nginx. El bloque `post` recoge logs y elimina los contenedores y volúmenes del proyecto de prueba tanto en éxito como en fallo.
 
 La aplicación local Angular también usa el proxy definido en `proxy.conf.json`; iniciar el backend en `localhost:8082` y el frontend con `npm start`.
 
