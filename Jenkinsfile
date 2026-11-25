@@ -73,10 +73,10 @@ pipeline {
                         http://backend:8082/api/servicio/listaServicioDto2 \
                         "Frontend container reached backend by its Compose service name."
                     wait_for_http \
-                        http://localhost/ \
+                        http://127.0.0.1/ \
                         "Frontend page is responding."
                     wait_for_http \
-                        http://localhost/api/servicio/listaServicioDto2 \
+                        http://127.0.0.1/api/servicio/listaServicioDto2 \
                         "Frontend reverse proxy is responding."
                 '''
             }
