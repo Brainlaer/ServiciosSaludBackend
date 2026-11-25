@@ -52,3 +52,9 @@ https://github.com/Brainlaer/ServiciosSaludFrontend
 
 Backend:
 https://github.com/Brainlaer/ServiciosSaludBackend
+
+## Integración continua con Jenkins
+
+La guía de instalación, configuración de credenciales, jobs, webhooks y evidencias está en [Jenkins-Entrega.md](Jenkins-Entrega.md).
+
+El `Jenkinsfile` construye las imágenes del backend y del frontend y ejecuta una prueba de comunicación por el nombre del servicio. Para que el pipeline pueda construir ambas imágenes, Jenkins clona el repositorio del frontend en la carpeta `frontend`.
